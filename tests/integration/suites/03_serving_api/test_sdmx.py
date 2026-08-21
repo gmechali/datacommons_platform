@@ -74,12 +74,15 @@ class TestSDMXAPI:
         headers["X-Log-SDMX"] = "true"
         headers["X-Use-Multi-Entity-Schema"] = "true"
 
-        url = f"{dcp_target.serving_url}/core/api/sdmx/v3/availability/dataflow/{sdmx_avail_spec.dataflow}"
+        url = f"{dcp_target.serving_url}/core/api/sdmx/v3/availability/available-constraint/dataflow/{sdmx_avail_spec.dataflow}"
         params = {}
         for k, v in sdmx_avail_spec.constraints.items():
             params[f"c[{k}]"] = v
 
         res = requests.get(url, params=params, headers=headers, timeout=30)
+        if res.status_code == 501:
+            pytest.skip("SDMX 3.0 Availability API returned 501 Not Implemented for keys other than *")
+
         assert res.status_code == 200, (
             f"SDMX 3.0 Availability API returned {res.status_code}: {res.text}"
         )

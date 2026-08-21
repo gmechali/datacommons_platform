@@ -328,15 +328,20 @@ def merge_manifests(manifests: Sequence[TestManifest]) -> TestManifest:
 def _load_single_manifest(manifest_path_or_str: str | Path) -> TestManifest:
     """Loads a single YAML test manifest or dataset folder."""
     repo_root = Path(__file__).resolve().parents[3]
+    manifests_root = repo_root / "tests" / "integration" / "manifests"
     test_data_root = repo_root / "tests" / "integration" / "test_data"
 
     # Search candidates in order:
     # 1. Exact path
     # 2. Relative to repo root
-    # 3. Inside tests/integration/test_data/<name>
+    # 3. Inside tests/integration/manifests/<name>.yaml
+    # 4. Inside tests/integration/test_data/<name>
     candidates = [
         Path(manifest_path_or_str),
         repo_root / manifest_path_or_str,
+        manifests_root / manifest_path_or_str,
+        manifests_root / f"{manifest_path_or_str}.yaml",
+        manifests_root / f"{manifest_path_or_str}.yml",
         test_data_root / manifest_path_or_str,
         test_data_root / manifest_path_or_str / "test_spec.yaml",
     ]
